@@ -49,7 +49,7 @@ with tab1:
                 value = fred.get_series(code).get(date, np.nan)
             except:
                 value = np.nan
-                data[label] = value
+            data[label] = value
         return pd.DataFrame([data])
 
     df = fetch_yield_curve(date)
