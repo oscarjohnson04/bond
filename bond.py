@@ -5,10 +5,10 @@ import plotly.graph_objects as go
 from fredapi import Fred
 import datetime as dt
 
-# FRED API setup
+# Initialize FRED
 fred = Fred(api_key='00edddc751dd47fb05bd7483df1ed0a3')
 
-# All available bond maturities
+# All available Treasury series
 series_ids = {
     '1 Month': 'DGS1MO',
     '3 Month': 'DGS3MO',
@@ -23,70 +23,118 @@ series_ids = {
     '30 Year': 'DGS30'
 }
 
-# --- Streamlit UI ---
-st.title("📊 Custom US Treasury Yield Curve Viewer")
+st.title("📊 US Treasury Yield Explorer")
 
-# Date picker
-default_date = dt.datetime.today()
-if default_date.weekday() >= 5:  # If weekend, set to Friday
-    default_date -= dt.timedelta(days=default_date.weekday() - 4)
-selected_date = st.date_input("Select date", value=default_date, min_value=dt.date(2002, 1, 1))
-date = pd.to_datetime(selected_date)
+# Tabs for the two functionalities
+tab1, tab2 = st.tabs(["📅 Yield on Selected Date", "📈 Historical Yields"])
 
-# Bond selection
-selected_bonds = st.multiselect(
-    "Select bond maturities to display:",
-    options=list(series_ids.keys()),
-    default=list(series_ids.keys())  # Default: all selected
-)
+# --------------------------------------------------------
+# 📅 Tab 1: Yield Curve on Selected Date
+# --------------------------------------------------------
+with tab1:
+    st.subheader("Yield Curve on a Specific Date")
 
-# If nothing is selected, don't proceed
-if not selected_bonds:
-    st.warning("Please select at least one bond maturity.")
-    st.stop()
+    # Smart default date (weekday)
+    default_date = dt.datetime.today()
+    if default_date.weekday() >= 5:
+        default_date -= dt.timedelta(days=default_date.weekday() - 4)
+    selected_date = st.date_input("Select a date", value=default_date, min_value=dt.date(2002, 1, 1))
+    date = pd.to_datetime(selected_date)
 
-# --- Fetch data ---
-@st.cache_data(show_spinner=False)
-def fetch_selected_yields(date, selected_bonds):
-    data = {}
-    for label in selected_bonds:
-        code = series_ids[label]
-        try:
-            value = fred.get_series(code).get(date, np.nan)
-        except:
-            value = np.nan
-        data[label] = value
-    return pd.DataFrame([data])
+    selected_bonds = st.multiselect(
+        "Select bonds to display:",
+        options=list(series_ids.keys()),
+        default=list(series_ids.keys())
+    )
 
-df = fetch_selected_yields(date, selected_bonds)
+    if selected_bonds:
+        @st.cache_data(show_spinner=False)
+        def fetch_yield_on_date(date, selected_bonds):
+            data = {}
+            for label in selected_bonds:
+                code = series_ids[label]
+                try:
+                    value = fred.get_series(code).get(date, np.nan)
+                except:
+                    value = np.nan
+                data[label] = value
+            return pd.DataFrame([data])
 
-# --- Format data for plotting ---
-df_t = df.T
-df_t.columns = ['Rate']
-df_t = df_t.reset_index().rename(columns={'index': 'Maturity'})
+        df = fetch_yield_on_date(date, selected_bonds)
+        df_t = df.T
+        df_t.columns = ['Rate']
+        df_t = df_t.reset_index().rename(columns={'index': 'Maturity'})
 
-# Show table
-st.subheader(f"Yield Data on {date.strftime('%Y-%m-%d')}")
-st.dataframe(df_t.set_index("Maturity"), use_container_width=True)
+        st.dataframe(df_t.set_index("Maturity"), use_container_width=True)
 
-# --- Plot ---
-fig = go.Figure()
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=df_t['Maturity'],
+            y=df_t['Rate'],
+            mode='lines+markers',
+            line=dict(color='royalblue', width=3),
+            marker=dict(size=8),
+            name=f'Yields on {date.strftime("%Y-%m-%d")}'
+        ))
+        fig.update_layout(
+            title=f'US Treasury Yield Curve on {date.strftime("%Y-%m-%d")}',
+            xaxis_title='Maturity',
+            yaxis_title='Yield (%)',
+            template='plotly_white'
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("Select at least one bond maturity to display the yield curve.")
 
-fig.add_trace(go.Scatter(
-    x=df_t['Maturity'],
-    y=df_t['Rate'],
-    mode='lines+markers',
-    line=dict(color='royalblue', width=3),
-    marker=dict(size=8),
-    name=f'Yield Curve on {date.strftime("%Y-%m-%d")}'
-))
+# --------------------------------------------------------
+# 📈 Tab 2: Historical Yield Plotter
+# --------------------------------------------------------
+with tab2:
+    st.subheader("Historical Yield Plotter")
 
-fig.update_layout(
-    title=f"US Treasury Yields on {date.strftime('%Y-%m-%d')}",
-    xaxis_title='Maturity',
-    yaxis_title='Yield (%)',
-    template='plotly_white',
-    height=500
-)
+    selected_bonds_hist = st.multiselect(
+        "Choose bonds to plot over time:",
+        options=list(series_ids.keys()),
+        default=["10 Year", "2 Year"]
+    )
 
-st.plotly_chart(fig, use_container_width=True)
+    start_date = st.date_input("Start date", value=dt.date(2015, 1, 1), key="start_date")
+    end_date = st.date_input("End date", value=dt.date.today(), key="end_date")
+
+    if start_date >= end_date:
+        st.warning("Start date must be before end date.")
+    elif selected_bonds_hist:
+        @st.cache_data(show_spinner=True)
+        def fetch_historical_yields(start_date, end_date, selected_bonds):
+            df = pd.DataFrame()
+            for label in selected_bonds:
+                code = series_ids[label]
+                try:
+                    series = fred.get_series(code, start_date, end_date).rename(label)
+                    df = pd.concat([df, series], axis=1)
+                except:
+                    continue
+            return df
+
+        df_hist = fetch_historical_yields(start_date, end_date, selected_bonds_hist)
+
+        st.dataframe(df_hist.tail(), use_container_width=True)
+
+        fig_hist = go.Figure()
+        for label in df_hist.columns:
+            fig_hist.add_trace(go.Scatter(
+                x=df_hist.index,
+                y=df_hist[label],
+                mode='lines',
+                name=label
+            ))
+
+        fig_hist.update_layout(
+            title="Historical US Treasury Yields",
+            xaxis_title="Date",
+            yaxis_title="Yield (%)",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_hist, use_container_width=True)
+    else:
+        st.info("Select at least one bond maturity to plot historical yields.")
