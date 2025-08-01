@@ -24,6 +24,7 @@ series_ids = {
 }
 
 yield_series_ids = {
+    'Federal Funds Rate': 'DFF',
     'US 1 Month': 'DGS1MO',
     'US 3 Month': 'DGS3MO',
     'US 6 Month': 'DGS6MO',
@@ -34,7 +35,11 @@ yield_series_ids = {
     'US 7 Year': 'DGS7',
     'US 10 Year': 'DGS10',
     'US 20 Year': 'DGS20',
-    'US 30 Year': 'DGS30'
+    'US 30 Year': 'DGS30',
+    'Moody AAA Corporate': 'DAAA',
+    'Moody BAA Corporate': 'DBAA',
+    'ICE BofA BBB Corporate': 'BAMLC0A4CBBBEY',
+    'ICE BofA CCC Corporate': 'BAMLH0A3HYCEY',
 }
 
 st.title("📊 US Treasury Yield Explorer")
