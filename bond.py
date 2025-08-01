@@ -42,13 +42,13 @@ yield_series_ids = {
     'ICE BofA CCC Corporate': 'BAMLH0A3HYCEY',
 }
 
-st.title("📊 US Treasury Yield Explorer")
+st.title("US Treasury Yield and other bonds Explorer")
 
 # Tabs for the two functionalities
-tab1, tab2 = st.tabs(["📅 Yield on Selected Date", "📈 Historical Yields"])
+tab1, tab2 = st.tabs(["Yield Curve on Selected Date", "Historical Yields"])
 
 # --------------------------------------------------------
-# 📅 Tab 1: Yield Curve on Selected Date
+# Tab 1: Yield Curve on Selected Date
 # --------------------------------------------------------
 with tab1:
     st.subheader("Yield Curve on a Specific Date")
@@ -97,7 +97,7 @@ with tab1:
     st.plotly_chart(fig, use_container_width=True)
 
 # --------------------------------------------------------
-# 📈 Tab 2: Historical Yield Plotter
+# Tab 2: Historical Yield Plotter
 # --------------------------------------------------------
 with tab2:
     st.subheader("Historical Yield Plotter")
