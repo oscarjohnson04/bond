@@ -23,6 +23,20 @@ series_ids = {
     '30 Year': 'DGS30'
 }
 
+yield_series_ids = {
+    'US 1 Month': 'DGS1MO',
+    'US 3 Month': 'DGS3MO',
+    'US 6 Month': 'DGS6MO',
+    'US 1 Year': 'DGS1',
+    'US 2 Year': 'DGS2',
+    'US 3 Year': 'DGS3',
+    'US 5 Year': 'DGS5',
+    'US 7 Year': 'DGS7',
+    'US 10 Year': 'DGS10',
+    'US 20 Year': 'DGS20',
+    'US 30 Year': 'DGS30'
+}
+
 st.title("📊 US Treasury Yield Explorer")
 
 # Tabs for the two functionalities
@@ -85,8 +99,8 @@ with tab2:
 
     selected_bonds_hist = st.multiselect(
         "Choose bonds to plot over time:",
-        options=list(series_ids.keys()),
-        default=["10 Year", "2 Year"]
+        options=list(yield_series_ids.keys()),
+        default=["US 10 Year", "US 1 Year"]
     )
 
     start_date = st.date_input("Start date", value=dt.date(2015, 1, 1), key="start_date")
@@ -99,7 +113,7 @@ with tab2:
         def fetch_historical_yields(start_date, end_date, selected_bonds):
             df = pd.DataFrame()
             for label in selected_bonds:
-                code = series_ids[label]
+                code = yield_series_ids[label]
                 try:
                     series = fred.get_series(code, start_date, end_date).rename(label)
                     df = pd.concat([df, series], axis=1)
