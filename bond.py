@@ -8,6 +8,38 @@ import datetime as dt
 # Initialize FRED
 fred = Fred(api_key='00edddc751dd47fb05bd7483df1ed0a3')
 
+start = dt.datetime(2015, 1, 1)
+end = dt.datetime.now()
+
+realgdp = fred.get_series('GDPC1', start, end).iloc[-1]
+unrate = fred.get_series('DGS3MO', start, end).iloc[-1]
+cpi = fred.get_series('MEDCPIM158SFRBCLE', start, end).iloc[-1]
+debtgdp = fred.get_series('GFDEGDQ188S', start, end).iloc[-1]
+fedrate = fred.get_series('DFEDTARU', start, end).iloc[-1]
+fedfundrate = fred.get_series('DFF', start, end).iloc[-1]
+trate = fred.get_series('DGS3MO', start, end).iloc[-1]
+tenrate = fred.get_series('DGS10', start, end).iloc[-1]
+longrate = fred.get_series('DGS30', start, end).iloc[-1]
+corprate = fred.get_series('DAAA', start, end).iloc[-1]
+vix = fred.get_series('VIXCLS', start, end).iloc[-1]
+usu = fred.get_series('USEPUINDXD', start, end).iloc[-1]
+gu = fred.get_series('GEPUCURRENT', start, end).iloc[-1]
+
+st.sidebar.title("Latest US Macro Data")
+st.sidebar.metric("Real GDP (In Billions)", f"${realgdp:.2f}")
+st.sidebar.metric("Unemployment Rate", f"{unrate:.2f}%")
+st.sidebar.metric("CPI", f"{cpi:.2f}%")
+st.sidebar.metric("Debt/GDP Ratio", f"{debtgdp:.2f}")
+st.sidebar.metric("Federal Reserve Interest Rate", f"{fedrate:.2f}%")
+st.sidebar.metric("Federal Funds Rate", f"{fedfundrate:.2f}%")
+st.sidebar.metric("3 month T-Bill yield", f"{trate:.2f}%")
+st.sidebar.metric("10 year bond yield", f"{tenrate:.2f}%")
+st.sidebar.metric("30 year bond yield", f"{longrate:.2f}%")
+st.sidebar.metric("Moody's AAA Corporate Bond Yield", f"{corprate:.2f}%")
+st.sidebar.metric("VIX", f"{vix:.2f}")
+st.sidebar.metric("US Economic Policy Uncertainty", f"{usu:.2f}")
+st.sidebar.metric("Global Economic Policy Uncertainty", f"{gu:.2f}")
+
 # All available Treasury series
 series_ids = {
     '1 Month': 'DGS1MO',
