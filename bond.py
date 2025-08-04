@@ -146,6 +146,14 @@ with tab1:
 
     st.plotly_chart(fig, use_container_width=True)
 
+    csv_curve = df_combined.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 Download yield curve data as CSV",
+        data=csv_curve,
+        file_name=f'yield_curve_comparison_{date1.date()}_vs_{date2.date()}.csv',
+        mime='text/csv'
+    )
+
 # --------------------------------------------------------
 # Tab 2: Historical Yield Plotter
 # --------------------------------------------------------
