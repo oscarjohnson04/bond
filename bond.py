@@ -1,4 +1,4 @@
-import streamlit as st
+simport streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
@@ -100,7 +100,7 @@ with tab1:
 # Tab 2: Historical Yield Plotter
 # --------------------------------------------------------
 with tab2:
-    st.subheader("Historical Yield Plotter")
+    st.subheader("Historical Yield Plotter. Please only select two bonds.")
 
     selected_bonds_hist = st.multiselect(
         "Choose bonds to plot over time:",
