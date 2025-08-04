@@ -128,6 +128,8 @@ with tab2:
 
         df_hist = fetch_historical_yields(start_date, end_date, selected_bonds_hist)
 
+        df_hist['Spread'] = df_hist.iloc[:,0] - df_hist.iloc[:,1]
+
         st.dataframe(df_hist.tail(), use_container_width=True)
 
         fig_hist = go.Figure()
@@ -140,11 +142,28 @@ with tab2:
             ))
 
         fig_hist.update_layout(
-            title="Historical US Treasury Yields",
+            title="Historical Treasury Yields",
             xaxis_title="Date",
             yaxis_title="Yield (%)",
             template="plotly_white"
         )
         st.plotly_chart(fig_hist, use_container_width=True)
+
+        fig2= go.Figure()
+        fig2.add_trace(go.Scatter(
+            x=df_hist.index,
+            y=df_hist[Spread],
+            mode='lines',
+            name='Yield Spread'
+        ))
+
+        fig2.update_layout(
+            title = "Yield Spread of your Selected Bonds",
+            xaxis_title = "Date", 
+            yaxis_title = "Spread",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+            
     else:
         st.info("Select at least one bond maturity to plot historical yields.")
