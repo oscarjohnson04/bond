@@ -218,3 +218,11 @@ with tab2:
             
     else:
         st.info("Select at least one bond maturity to plot historical yields.")
+
+    csv = df_hist.to_csv().encode('utf-8')
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name='historical_yields.csv',
+        mime='text/csv'
+    )
