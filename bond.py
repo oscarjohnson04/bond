@@ -152,7 +152,7 @@ with tab2:
         fig2= go.Figure()
         fig2.add_trace(go.Scatter(
             x=df_hist.index,
-            y=df_hist[Spread],
+            y=df_hist['Spread'],
             mode='lines',
             name='Yield Spread'
         ))
@@ -163,6 +163,8 @@ with tab2:
             yaxis_title = "Spread",
             template="plotly_white"
         )
+        st.plotly_chart(fig_hist, use_container_width=True)
+
         st.plotly_chart(fig2, use_container_width=True)
             
     else:
