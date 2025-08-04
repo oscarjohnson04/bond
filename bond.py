@@ -163,7 +163,6 @@ with tab2:
             yaxis_title = "Spread",
             template="plotly_white"
         )
-        st.plotly_chart(fig_hist, use_container_width=True)
 
         st.plotly_chart(fig2, use_container_width=True)
             
