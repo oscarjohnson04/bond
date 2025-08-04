@@ -54,11 +54,15 @@ with tab1:
     st.subheader("Yield Curve on a Specific Date")
 
     # Smart default date (weekday)
-    default_date = dt.datetime.today()
-    if default_date.weekday() >= 5:
-        default_date -= dt.timedelta(days=default_date.weekday() - 4)
-    selected_date = st.date_input("Select a date", value=default_date, min_value=dt.date(2002, 1, 1))
-    date = pd.to_datetime(selected_date)
+    today = dt.datetime.today()
+    if today.weekday() >= 5:
+        today -= dt.timedelta(days=today.weekday() - 4)
+
+    date1 = st.date_input("Select first date", value=today, min_value=dt.date(2002, 1, 1), key="date1")
+    date2 = st.date_input("Select second date", value=today - dt.timedelta(days=365), min_value=dt.date(2002, 1, 1), key="date2")
+
+    date1 = pd.to_datetime(date1)
+    date2 = pd.to_datetime(date2)
     
     @st.cache_data(show_spinner=False)
     def fetch_yield_curve(date):
@@ -71,29 +75,43 @@ with tab1:
             data[label] = value
         return pd.DataFrame([data])
 
-    df = fetch_yield_curve(date)
-    
-    df_t = df.T
-    df_t.columns = ['Rate']
-    df_t = df_t.reset_index().rename(columns={'index': 'Maturity'})
+    df1 = fetch_yield_curve(date1)
+    df2 = fetch_yield_curve(date2)
 
-    st.dataframe(df_t.set_index("Maturity"), use_container_width=True)
+    df1_t = df1.T.reset_index()
+    df1_t.columns = ['Maturity', 'Rate1']
 
+    df2_t = df2.T.reset_index()
+    df2_t.columns = ['Maturity', 'Rate2']
+
+    df_combined = pd.merge(df1_t, df2_t, on='Maturity')
+
+    st.dataframe(df_combined.set_index("Maturity"), use_container_width=True)
+
+    # Plot both curves
     fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=df_t['Maturity'],
-        y=df_t['Rate'],
+        x=df_combined['Maturity'],
+        y=df_combined['Rate1'],
         mode='lines+markers',
-        line=dict(color='royalblue', width=3),
-        marker=dict(size=8),
-        name=f'Yields on {date.strftime("%Y-%m-%d")}'
+        name=f'Yields on {date1.strftime("%Y-%m-%d")}',
+        line=dict(color='royalblue')
     ))
+    fig.add_trace(go.Scatter(
+        x=df_combined['Maturity'],
+        y=df_combined['Rate2'],
+        mode='lines+markers',
+        name=f'Yields on {date2.strftime("%Y-%m-%d")}',
+        line=dict(color='firebrick')
+    ))
+
     fig.update_layout(
-        title=f'US Treasury Yield Curve on {date.strftime("%Y-%m-%d")}',
+        title='US Treasury Yield Curves Comparison',
         xaxis_title='Maturity',
         yaxis_title='Yield (%)',
         template='plotly_white'
     )
+
     st.plotly_chart(fig, use_container_width=True)
 
 # --------------------------------------------------------
