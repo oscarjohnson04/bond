@@ -133,7 +133,7 @@ with tab2:
         st.dataframe(df_hist.tail(), use_container_width=True)
 
         fig_hist = go.Figure()
-        for label in df_hist.columns:
+        for label in df_hist.columns[:-1]:
             fig_hist.add_trace(go.Scatter(
                 x=df_hist.index,
                 y=df_hist[label],
