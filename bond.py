@@ -11,34 +11,39 @@ fred = Fred(api_key='00edddc751dd47fb05bd7483df1ed0a3')
 start = dt.datetime(2015, 1, 1)
 end = dt.datetime.now()
 
-realgdp = fred.get_series('GDPC1', start, end).iloc[-1]
-unrate = fred.get_series('DGS3MO', start, end).iloc[-1]
-cpi = fred.get_series('MEDCPIM158SFRBCLE', start, end).iloc[-1]
-debtgdp = fred.get_series('GFDEGDQ188S', start, end).iloc[-1]
-fedrate = fred.get_series('DFEDTARU', start, end).iloc[-1]
-fedfundrate = fred.get_series('DFF', start, end).iloc[-1]
-trate = fred.get_series('DGS3MO', start, end).iloc[-1]
-tenrate = fred.get_series('DGS10', start, end).iloc[-1]
-longrate = fred.get_series('DGS30', start, end).iloc[-1]
-corprate = fred.get_series('DAAA', start, end).iloc[-1]
-vix = fred.get_series('VIXCLS', start, end).iloc[-1]
-usu = fred.get_series('USEPUINDXD', start, end).iloc[-1]
-gu = fred.get_series('GEPUCURRENT', start, end).iloc[-1]
+@st.cache_data(show_spinner=False)
+def fetch_multiple_latest_series(series_ids):
+    data = {}
+    for name, code in series_ids.items():
+        try:
+            series = fred.get_series(code, start, end)
+            data[name] = series.iloc[-1]
+        except:
+            data[name] = np.nan
+    return data
 
-st.sidebar.title("Latest US Macro Data")
-st.sidebar.metric("Real GDP (In Billions)", f"${realgdp:.2f}")
-st.sidebar.metric("Unemployment Rate", f"{unrate:.2f}%")
-st.sidebar.metric("CPI", f"{cpi:.2f}%")
-st.sidebar.metric("Debt/GDP Ratio", f"{debtgdp:.2f}")
-st.sidebar.metric("Federal Reserve Interest Rate", f"{fedrate:.2f}%")
-st.sidebar.metric("Federal Funds Rate", f"{fedfundrate:.2f}%")
-st.sidebar.metric("3 month T-Bill yield", f"{trate:.2f}%")
-st.sidebar.metric("10 year bond yield", f"{tenrate:.2f}%")
-st.sidebar.metric("30 year bond yield", f"{longrate:.2f}%")
-st.sidebar.metric("Moody's AAA Corporate Bond Yield", f"{corprate:.2f}%")
-st.sidebar.metric("VIX", f"{vix:.2f}")
-st.sidebar.metric("US Economic Policy Uncertainty", f"{usu:.2f}")
-st.sidebar.metric("Global Economic Policy Uncertainty", f"{gu:.2f}")
+sidebar_series_ids = {
+    "Real GDP (In Billions)": "GDPC1",
+    "Unemployment Rate": "DGS3MO",
+    "CPI": "MEDCPIM158SFRBCLE",
+    "Debt/GDP Ratio": "GFDEGDQ188S",
+    "Federal Reserve Interest Rate": "DFEDTARU",
+    "Federal Funds Rate": "DFF",
+    "3 month T-Bill yield": "DGS3MO",
+    "10 year bond yield": "DGS10",
+    "30 year bond yield": "DGS30",
+    "Moody's AAA Corporate Bond Yield": "DAAA",
+    "VIX": "VIXCLS",
+    "US Economic Policy Uncertainty": "USEPUINDXD",
+    "Global Economic Policy Uncertainty": "GEPUCURRENT"
+}
+
+latest_data = fetch_multiple_latest_series(sidebar_series_ids)
+
+for label, value in latest_data.items():
+    suffix = "%" if "Rate" in label or "Yield" in label or "CPI" in label else ""
+    prefix = "$" if "GDP" in label else ""
+    st.sidebar.metric(label, f"{prefix}{value:.2f}{suffix}")
 
 # All available Treasury series
 series_ids = {
@@ -186,8 +191,9 @@ with tab2:
 
         df_hist = fetch_historical_yields(start_date, end_date, selected_bonds_hist)
 
-        df_hist['Spread'] = df_hist.iloc[:,0] - df_hist.iloc[:,1]
-
+        if len(df_hist.columns) >= 2:
+            df_hist['Spread'] = df_hist.iloc[:, 0] - df_hist.iloc[:, 1]
+            
         st.dataframe(df_hist.tail(), use_container_width=True)
 
         fig_hist = go.Figure()
@@ -221,8 +227,8 @@ with tab2:
             yaxis_title = "Spread",
             template="plotly_white"
         )
-
-        st.plotly_chart(fig2, use_container_width=True)
+        if 'Spread' in df_hist.columns:
+            st.plotly_chart(fig2, use_container_width=True)
             
     else:
         st.info("Select at least one bond maturity to plot historical yields.")
