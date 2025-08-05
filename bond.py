@@ -327,7 +327,7 @@ with tab3:
                     if thumb:
                         colA, colB = st.columns([1, 3])
                         with colA:
-                            st.image(thumb, use_column_width=True)
+                            st.image(thumb, use_container_width=True)
                         with colB:
                             st.markdown(f"### [{title}]({url})")
                             st.caption(f"{source} · {published}")
