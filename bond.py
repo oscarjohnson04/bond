@@ -7,6 +7,7 @@ import datetime as dt
 import requests
 
 st.set_page_config(page_title="US Yields & Macro Explorer", layout="wide")
+tab1, tab2, tab3 = st.tabs(["Yield Curve on Selected Date", "Historical Yields", "News"])
 
 # =========================
 # CONFIG / CLIENTS
@@ -17,6 +18,7 @@ NEWS_API_KEY = "80f3080a10da4d91809c5e53cf0d9828"
 fred = Fred(api_key=FRED_API_KEY)
 START = dt.date(2015, 1, 1)
 END = dt.date.today()
+
 
 # =========================
 # HELPERS (CACHED)
@@ -165,7 +167,6 @@ for label, value in latest_data.items():
 # =========================
 # TABS
 # =========================
-tab1, tab2, tab3 = st.tabs(["Yield Curve on Selected Date", "Historical Yields", "News"])
 
 # ---------------- TAB 1 ----------------
 with tab1:
