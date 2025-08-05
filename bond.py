@@ -4,6 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from fredapi import Fred
 import datetime as dt
+import requests
 
 # Initialize FRED
 fred = Fred(api_key='00edddc751dd47fb05bd7483df1ed0a3')
@@ -241,3 +242,95 @@ with tab2:
         file_name='historical_yields.csv',
         mime='text/csv'
     )
+
+with tab3:
+    st.subheader("📣 Latest News on Bonds, Rates & Macro")
+
+    # --- Config / API Key ---
+    NEWS_API_KEY = "80f3080a10da4d91809c5e53cf0d9828"
+
+    # --- Controls ---
+    colq1, colq2, colq3 = st.columns([2, 1, 1])
+    with colq1:
+        query = st.text_input("Search query", value="US Treasury yields OR bond market OR Federal Reserve")
+    with colq2:
+        page_size = st.number_input("Articles to show", min_value=3, max_value=30, value=10, step=1)
+    with colq3:
+        sort_by = st.selectbox("Sort by", options=["publishedAt", "relevancy", "popularity"], index=0)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        from_date = st.date_input("From date (optional)", value=None, key="news_from")
+    with c2:
+        to_date = st.date_input("To date (optional)", value=None, key="news_to")
+
+    st.caption("Tip: On the free NewsAPI tier, coverage is generally the last ~30 days.")
+
+    # --- Fetcher ---
+    @st.cache_data(show_spinner=True, ttl=60 * 15)  # cache 15 minutes
+    def fetch_news(query, page_size, sort_by, from_date, to_date):
+        url = "https://newsapi.org/v2/everything"
+        params = {
+            "q": query,
+            "language": "en",
+            "pageSize": int(page_size),
+            "sortBy": sort_by,
+            "apiKey": NEWS_API_KEY
+        }
+        # Only include dates if provided (NewsAPI expects YYYY-MM-DD)
+        if from_date:
+            params["from"] = str(from_date)
+        if to_date:
+            params["to"] = str(to_date)
+
+        try:
+            r = requests.get(url, params=params, timeout=15)
+            r.raise_for_status()
+            payload = r.json()
+            status = payload.get("status", "error")
+            if status != "ok":
+                return [], f"NewsAPI error: {payload.get('message', 'Unknown error')}"
+            return payload.get("articles", []), None
+        except Exception as e:
+            return [], f"Request failed: {e}"
+
+    # --- Call API ---
+    articles, err = fetch_news(query, page_size, sort_by, from_date, to_date)
+
+    if err:
+        st.error(err)
+    elif not articles:
+        st.info("No articles found. Try adjusting your query or date range.")
+    else:
+        # Optional: compact toggle
+        compact = st.toggle("Compact view", value=False)
+
+        for a in articles:
+            title = a.get("title") or "Untitled"
+            url = a.get("url") or ""
+            source = (a.get("source") or {}).get("name") or "Unknown source"
+            published = (a.get("publishedAt") or "")[:10]
+            desc = a.get("description") or ""
+            thumb = a.get("urlToImage")
+
+            if compact:
+                # Single-line compact card
+                st.markdown(
+                    f"- **[{title}]({url})** — {source} · {published}"
+                )
+            else:
+                with st.container(border=True):
+                    if thumb:
+                        colA, colB = st.columns([1, 3])
+                        with colA:
+                            st.image(thumb, use_column_width=True)
+                        with colB:
+                            st.markdown(f"### [{title}]({url})")
+                            st.caption(f"{source} · {published}")
+                            if desc:
+                                st.write(desc)
+                    else:
+                        st.markdown(f"### [{title}]({url})")
+                        st.caption(f"{source} · {published}")
+                        if desc:
+                            st.write(desc)
