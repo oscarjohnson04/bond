@@ -153,7 +153,7 @@ with tab1:
 
     csv_curve = df_combined.to_csv(index=False).encode('utf-8')
     st.download_button(
-        label="📥 Download yield curve data as CSV",
+        label="Download yield curve data as CSV",
         data=csv_curve,
         file_name=f'yield_curve_comparison_{date1.date()}_vs_{date2.date()}.csv',
         mime='text/csv'
@@ -191,7 +191,7 @@ with tab2:
 
         df_hist = fetch_historical_yields(start_date, end_date, selected_bonds_hist)
 
-        if len(df_hist.columns) = 2:
+        if len(df_hist.columns) == 2:
             df_hist['Spread'] = df_hist.iloc[:, 0] - df_hist.iloc[:, 1]
             
         st.dataframe(df_hist.tail(), use_container_width=True)
