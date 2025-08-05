@@ -83,7 +83,7 @@ yield_series_ids = {
 st.title("US Treasury Yield and other bonds Explorer")
 
 # Tabs for the two functionalities
-tab1, tab2 = st.tabs(["Yield Curve on Selected Date", "Historical Yields"])
+tab1, tab2, tab3 = st.tabs(["Yield Curve on Selected Date", "Historical Yields", "News"])
 
 # --------------------------------------------------------
 # Tab 1: Yield Curve on Selected Date
@@ -244,7 +244,7 @@ with tab2:
     )
 
 with tab3:
-    st.subheader("📣 Latest News on Bonds, Rates & Macro")
+    st.subheader("Latest News on Bonds, Rates & Macro")
 
     # --- Config / API Key ---
     NEWS_API_KEY = "80f3080a10da4d91809c5e53cf0d9828"
