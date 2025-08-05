@@ -289,7 +289,7 @@ with tab3:
     with colq2:
         page_size = st.number_input("Articles to show", min_value=3, max_value=30, value=10, step=1)
     with colq3:
-        sort_by = st.selectbox("Sort by", ["Date", "relevancy", "popularity"], index=0)
+        sort_by = st.selectbox("Sort by", ["Date", "Relevancy", "Popularity"], index=0)
 
     use_dates = st.toggle("Filter by date range", value=False)
     if use_dates:
