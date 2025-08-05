@@ -7,6 +7,7 @@ import datetime as dt
 import requests
 
 st.set_page_config(page_title="US Yields & Macro Explorer", layout="wide")
+st.title("US Yields & Macro Explorer")
 tab1, tab2, tab3 = st.tabs(["Yield Curve on Selected Date", "Historical Yields", "News"])
 
 # =========================
@@ -170,7 +171,7 @@ for label, value in latest_data.items():
 
 # ---------------- TAB 1 ----------------
 with tab1:
-    st.subheader("Yield Curve on Two Selected Dates")
+    st.subheader("Yield Curve on Selected Dates")
 
     # Smart weekday default for today
     today = dt.date.today()
@@ -288,7 +289,7 @@ with tab3:
     with colq2:
         page_size = st.number_input("Articles to show", min_value=3, max_value=30, value=10, step=1)
     with colq3:
-        sort_by = st.selectbox("Sort by", ["publishedAt", "relevancy", "popularity"], index=0)
+        sort_by = st.selectbox("Sort by", ["Date", "relevancy", "popularity"], index=0)
 
     use_dates = st.toggle("Filter by date range", value=False)
     if use_dates:
@@ -315,7 +316,7 @@ with tab3:
             title = a.get("title") or "Untitled"
             url = a.get("url") or ""
             source = (a.get("source") or {}).get("name") or "Unknown source"
-            published = (a.get("publishedAt") or "")[:10]
+            published = (a.get("Date") or "")[:10]
             desc = a.get("description") or ""
             thumb = a.get("urlToImage")
 
