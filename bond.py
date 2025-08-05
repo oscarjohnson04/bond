@@ -197,13 +197,14 @@ with tab2:
         st.dataframe(df_hist.tail(), use_container_width=True)
 
         fig_hist = go.Figure()
-        for label in df_hist.columns[:-1]:
-            fig_hist.add_trace(go.Scatter(
+        for label in df_hist.columns:
+            if label != 'Spread':
+                fig_hist.add_trace(go.Scatter(
                 x=df_hist.index,
                 y=df_hist[label],
                 mode='lines',
                 name=label
-            ))
+                ))
 
         fig_hist.update_layout(
             title="Historical Treasury Yields",
