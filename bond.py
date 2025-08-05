@@ -191,7 +191,7 @@ with tab2:
 
         df_hist = fetch_historical_yields(start_date, end_date, selected_bonds_hist)
 
-        if len(df_hist.columns) >= 2:
+        if len(df_hist.columns) = 2:
             df_hist['Spread'] = df_hist.iloc[:, 0] - df_hist.iloc[:, 1]
             
         st.dataframe(df_hist.tail(), use_container_width=True)
@@ -213,21 +213,21 @@ with tab2:
         )
         st.plotly_chart(fig_hist, use_container_width=True)
 
-        fig2= go.Figure()
-        fig2.add_trace(go.Scatter(
-            x=df_hist.index,
-            y=df_hist['Spread'],
-            mode='lines',
-            name='Yield Spread'
-        ))
-
-        fig2.update_layout(
-            title = "Yield Spread of your Selected Bonds",
-            xaxis_title = "Date", 
-            yaxis_title = "Spread",
-            template="plotly_white"
-        )
         if 'Spread' in df_hist.columns:
+            fig2 = go.Figure()
+            fig2.add_trace(go.Scatter(
+                x=df_hist.index,
+                y=df_hist['Spread'],
+                mode='lines',
+                name='Yield Spread'
+            ))
+
+            fig2.update_layout(
+                title="Yield Spread of Your Selected Bonds",
+                xaxis_title="Date",
+                yaxis_title="Spread (%)",
+                template="plotly_white"
+            )
             st.plotly_chart(fig2, use_container_width=True)
             
     else:
