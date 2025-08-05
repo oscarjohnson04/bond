@@ -1,5 +1,6 @@
-streamlit
+esstreamlit
 pandas
 numpy
 plotly
 fredapi
+requests
