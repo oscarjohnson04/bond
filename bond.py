@@ -7,7 +7,6 @@ import datetime as dt
 import requests
 
 st.set_page_config(page_title="US Yields & Macro Explorer", layout="wide")
-st.markdown("**DEBUG:** Creating tabs now...")
 tab1, tab2, tab3 = st.tabs(["Yield Curve on Selected Date", "Historical Yields", "News"])
 
 # =========================
@@ -339,4 +338,3 @@ with tab3:
                         if desc:
                             st.write(desc)
 
-st.markdown("---")
