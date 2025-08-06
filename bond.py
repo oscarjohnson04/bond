@@ -138,8 +138,8 @@ yield_series_ids = {
 
 sidebar_series_ids = {
     "Real GDP (Billions, chained 2017$)": "GDPC1",
-    "Unemployment proxy (3M T-Bill)": "DGS3MO",
-    "Core Median CPI (Cleveland Fed)": "MEDCPIM158SFRBCLE",
+    "Unemployment Rate": "UNRATE",
+    "Core Median CPI": "MEDCPIM158SFRBCLE",
     "Debt/GDP Ratio": "GFDEGDQ188S",
     "Fed Target Upper Bound": "DFEDTARU",
     "Effective Fed Funds Rate": "DFF",
