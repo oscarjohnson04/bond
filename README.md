@@ -1,4 +1,4 @@
-This is a tool that I made that can be helpful when analysing and researching US government debt
+This is a tool that I made that can be helpful when analysing and researching US government debt. The link to use the tool can be found here: https://ny5cclufgej5fustm2jgun.streamlit.app/
 
 What this tool does:
   + Constructs the yield curve on two different dates based on data from FRED, which can then be saved as a csv
