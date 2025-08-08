@@ -158,8 +158,8 @@ sidebar_series_ids = {
 st.sidebar.title("Latest US Macro Data")
 latest_data = fetch_multiple_latest_series(sidebar_series_ids, START, END)
 for label, value in latest_data.items():
-    suffix = "%" if any(k in label.lower() for k in ["rate", "yield", "cpi", "uncertainty"]) else ""
-    prefix = "$" if "gdp" in label.lower() else ""
+    suffix = "%" if any(k in label.lower() for k in ["rate", "yield", "cpi", "target"]) else ""
+    prefix = "$" if "real gdp" in label.lower() else ""
     if np.isnan(value):
         st.sidebar.metric(label, "N/A")
     else:
