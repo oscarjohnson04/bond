@@ -188,9 +188,9 @@ with tab1:
     df2 = fetch_yield_curve_for_date(date2, treasury_series)
 
     df1_t = df1.T.reset_index()
-    df1_t.columns = ['Maturity', 'Rate1']
+    df1_t.columns = ['Maturity', 'Yields on the First Date']
     df2_t = df2.T.reset_index()
-    df2_t.columns = ['Maturity', 'Rate2']
+    df2_t.columns = ['Maturity', 'Yields on the Second Date']
 
     df_combined = pd.merge(df1_t, df2_t, on='Maturity')
 
@@ -198,11 +198,11 @@ with tab1:
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=df_combined['Maturity'], y=df_combined['Rate1'],
+        x=df_combined['Maturity'], y=df_combined['Yields on the First Date'],
         mode='lines+markers', name=f"{date1}",
     ))
     fig.add_trace(go.Scatter(
-        x=df_combined['Maturity'], y=df_combined['Rate2'],
+        x=df_combined['Maturity'], y=df_combined['Yields on the Second Date'],
         mode='lines+markers', name=f"{date2}",
     ))
     fig.update_layout(
